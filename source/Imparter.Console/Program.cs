@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Imparter.Store;
 
 namespace Imparter.Cmd
 {
@@ -7,16 +8,14 @@ namespace Imparter.Cmd
     {
         static void Main(string[] args)
         {
-            var commandQueue = new InMemoryQueue();
-            var eventQueue = new InMemoryQueue();
 
-            var service = new ImparterTestService(commandQueue, eventQueue);
+            var service = new ImparterTestService();
             service.Start();
             
-            var sender = new MessageDispatcher(commandQueue);
+            var commandImparter = new MessageImparter(InMemoryQueue.Get("commands"));
             var eventHandlers = new HandlerResolver();
             eventHandlers.Register<TestEvent>(Handle);
-            var eventSubscriber = new MessageSubscriber(eventQueue, eventHandlers);
+            var eventSubscriber = new MessageSubscriber(InMemoryQueue.Get("events"), eventHandlers);
             eventSubscriber.Subscribe();
 
             while (true)
@@ -24,7 +23,7 @@ namespace Imparter.Cmd
                 var input = Console.ReadLine();
                 if (input == "q")
                     break;
-                sender.Dispatch(new TestCommand(input)).GetAwaiter().GetResult();
+                commandImparter.Impart(new TestCommand(input)).GetAwaiter().GetResult();
             }
 
             eventSubscriber.Unsubscribe();

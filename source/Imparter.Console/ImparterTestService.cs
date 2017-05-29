@@ -1,6 +1,5 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Imparter.Store;
 
 namespace Imparter.Cmd
 {
@@ -8,16 +7,16 @@ namespace Imparter.Cmd
     {
         private readonly MessageSubscriber _commandSubscriber;
 
-        public ImparterTestService(InMemoryQueue commandQueue, InMemoryQueue eventQueue)
+        public ImparterTestService()
         {
-            var eventDispatcher = new MessageDispatcher(eventQueue);
+            var eventDispatcher = new MessageImparter(InMemoryQueue.Get("events"));
 
             var handlerResolver = new HandlerResolver();
             handlerResolver.Register<TestCommand>(async command => {
                 Console.WriteLine($"Got {command.Input}");
-                await eventDispatcher.Dispatch(new TestEvent {Value = $"Event because of {command.Input}"});
+                await eventDispatcher.Impart(new TestEvent {Value = $"Event because of {command.Input}"});
             });
-            _commandSubscriber = new MessageSubscriber(commandQueue, handlerResolver);
+            _commandSubscriber = new MessageSubscriber(InMemoryQueue.Get("commands"), handlerResolver);
             
         }
 

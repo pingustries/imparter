@@ -1,17 +1,18 @@
 ﻿using System.Threading.Tasks;
+using Imparter.Store;
 
 namespace Imparter
 {
-    public class MessageDispatcher
+    public class MessageImparter
     {
         private readonly IMessageQueue _messageQueue;
 
-        public MessageDispatcher(IMessageQueue messageQueue)
+        public MessageImparter(IMessageQueue messageQueue)
         {
             _messageQueue = messageQueue;
         }
 
-        public async Task Dispatch(IMessage command)
+        public async Task Impart(IMessage command)
         {
             await _messageQueue.Enqueue(command);
         }

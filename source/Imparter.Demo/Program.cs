@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Imparter.Handling;
 using Imparter.Store;
 
 namespace Imparter.Demo

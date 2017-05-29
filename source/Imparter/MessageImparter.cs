@@ -12,9 +12,12 @@ namespace Imparter
             _messageQueue = messageQueueFactory.Get(queueName);
         }
 
-        public async Task Impart(IMessage command)
+        public async Task Impart(params IMessage[] messages)
         {
-            await _messageQueue.Enqueue(command);
+            foreach (var command in messages)
+            {
+                await _messageQueue.Enqueue(command);
+            }
         }
     }
 }

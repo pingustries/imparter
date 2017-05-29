@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Imparter.Handling;
 using Imparter.Store;
 
 namespace Imparter
@@ -37,7 +38,11 @@ namespace Imparter
                     IMessage message = await queue.Dequeue();
                     if (message == null)
                         break;
-                    await _handlers.Handle(message);
+                    foreach (var handler in _handlers.Resolve(message))
+                    {
+                        await handler(message);
+                    }
+                    
                 } while (true);
                 await Task.Delay(500, tokenSourceToken);
             }

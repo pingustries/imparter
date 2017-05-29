@@ -1,6 +1,6 @@
 ﻿namespace Imparter.Demo
 {
-    class TestEvent : IEvent
+    class TestEvent : IMessage
     {
         public string Value { get; set; }
     }

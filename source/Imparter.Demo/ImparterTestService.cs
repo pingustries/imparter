@@ -1,4 +1,5 @@
 using System;
+using Imparter.Handling;
 using Imparter.Store;
 
 namespace Imparter.Demo
@@ -9,7 +10,7 @@ namespace Imparter.Demo
 
         public ImparterTestService()
         {
-            var eventImparter = new EventImparter(new InMemoryMessageQueueFactory(), "events");
+            var eventImparter = new MessageImparter(new InMemoryMessageQueueFactory(), "events");
 
             var handlerResolver = new HandlerResolver();
             handlerResolver.Register<TestCommand>(async command => {

@@ -9,20 +9,20 @@ namespace Imparter.Cmd
 
         public ImparterTestService()
         {
-            var eventDispatcher = new MessageImparter(InMemoryQueue.Get("events"));
+            var eventDispatcher = new MessageImparter(new InMemoryMessageQueueFactory(), "events");
 
             var handlerResolver = new HandlerResolver();
             handlerResolver.Register<TestCommand>(async command => {
                 Console.WriteLine($"Got {command.Input}");
                 await eventDispatcher.Impart(new TestEvent {Value = $"Event because of {command.Input}"});
             });
-            _commandSubscriber = new MessageSubscriber(InMemoryQueue.Get("commands"), handlerResolver);
+            _commandSubscriber = new MessageSubscriber(new InMemoryMessageQueueFactory(), handlerResolver);
             
         }
 
         public void Start()
         {
-            _commandSubscriber.Subscribe();
+            _commandSubscriber.Subscribe("commands");
         }
 
 

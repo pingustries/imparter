@@ -7,9 +7,9 @@ namespace Imparter
     {
         private readonly IMessageQueue _messageQueue;
 
-        public MessageImparter(IMessageQueue messageQueue)
+        public MessageImparter(IMessageQueueFactory messageQueueFactory, string queueName)
         {
-            _messageQueue = messageQueue;
+            _messageQueue = messageQueueFactory.Get(queueName);
         }
 
         public async Task Impart(IMessage command)

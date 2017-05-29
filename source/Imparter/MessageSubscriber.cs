@@ -6,20 +6,20 @@ namespace Imparter
 {
     public class MessageSubscriber
     {
+        private readonly IMessageQueueFactory _queueFactory;
         private readonly HandlerResolver _handlers;
-        private readonly IMessageQueue _queue;
         private CancellationTokenSource _tokenSource;
 
-        public MessageSubscriber(IMessageQueue queue, HandlerResolver handlers)
+        public MessageSubscriber(IMessageQueueFactory queueFactory, HandlerResolver handlers)
         {
-            _queue = queue;
+            _queueFactory = queueFactory;
             _handlers = handlers;
         }
 
-        public void Subscribe()
+        public void Subscribe(string queueName)
         {
             _tokenSource = new CancellationTokenSource();
-            Task.Factory.StartNew(() => StartProcessLoop(_tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            Task.Factory.StartNew(() => StartProcessLoop(queueName, _tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         public void Unsubscribe()
@@ -27,26 +27,20 @@ namespace Imparter
             _tokenSource.Cancel();
         }
 
-        private async Task StartProcessLoop(CancellationToken tokenSourceToken)
+        private async Task StartProcessLoop(string queueName, CancellationToken tokenSourceToken)
         {
+            var queue = _queueFactory.Get(queueName);
             while (!tokenSourceToken.IsCancellationRequested)
             {
-                bool somethingProcessed;
                 do
                 {
-                    somethingProcessed = await ProcessStore();
-                } while (somethingProcessed);
+                    IMessage message = await queue.Dequeue();
+                    if (message == null)
+                        break;
+                    await _handlers.Handle(message);
+                } while (true);
                 await Task.Delay(500, tokenSourceToken);
             }
-        }
-
-        private async Task<bool> ProcessStore()
-        {
-            IMessage message = await _queue.Dequeue();
-            if (message == null)
-                return false;
-            await _handlers.Handle(message);
-            return true;
         }
     }
 }

@@ -47,6 +47,8 @@
     <Compile Include="HandlerResolver.cs" />
     <Compile Include="IMessage.cs" />
     <Compile Include="Store\IMessageQueue.cs" />
+    <Compile Include="Store\IMessageQueueFactory.cs" />
+    <Compile Include="Store\InMemoryMessageQueueFactory.cs" />
     <Compile Include="Store\InMemoryQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

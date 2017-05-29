@@ -12,11 +12,11 @@ namespace Imparter.Cmd
             var service = new ImparterTestService();
             service.Start();
             
-            var commandImparter = new MessageImparter(InMemoryQueue.Get("commands"));
+            var commandImparter = new MessageImparter(new InMemoryMessageQueueFactory(), "commands");
             var eventHandlers = new HandlerResolver();
             eventHandlers.Register<TestEvent>(Handle);
-            var eventSubscriber = new MessageSubscriber(InMemoryQueue.Get("events"), eventHandlers);
-            eventSubscriber.Subscribe();
+            var eventSubscriber = new MessageSubscriber(new InMemoryMessageQueueFactory(), eventHandlers);
+            eventSubscriber.Subscribe("events");
 
             while (true)
             {

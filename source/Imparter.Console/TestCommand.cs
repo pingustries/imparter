@@ -1,4 +1,4 @@
-﻿namespace Imparter.Cmd
+﻿namespace Imparter.Demo
 {
     internal class TestCommand : IMessage
     {

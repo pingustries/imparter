@@ -14,9 +14,9 @@ namespace Imparter.Store
             _queue = new ConcurrentQueue<IMessage>();
         }
 
-        public Task Enqueue(IMessage command)
+        public Task Enqueue(IMessage message)
         {
-            _queue.Enqueue(command);
+            _queue.Enqueue(message);
             return Task.FromResult(0);
         }
 

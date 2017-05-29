@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Imparter.Store;
 
-namespace Imparter.Cmd
+namespace Imparter.Demo
 {
     class Program
     {

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{78BDBA95-EB60-4AF7-AF25-59D18696472C}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Imparter.Cmd</RootNamespace>
-    <AssemblyName>Imparter.Cmd</AssemblyName>
+    <RootNamespace>Imparter.Demo</RootNamespace>
+    <AssemblyName>Imparter.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventImparter.cs" />
+    <Compile Include="IEvent.cs" />
     <Compile Include="MessageImparter.cs" />
     <Compile Include="IHandle.cs" />
     <Compile Include="MessageSubscriber.cs" />

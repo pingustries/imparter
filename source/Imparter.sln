@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter", "Imparter\Imparter.csproj", "{B167C10A-F568-417F-BD96-092F2FBE415F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.Demo", "Imparter.Console\Imparter.Demo.csproj", "{78BDBA95-EB60-4AF7-AF25-59D18696472C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.Demo", "Imparter.Demo\Imparter.Demo.csproj", "{78BDBA95-EB60-4AF7-AF25-59D18696472C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

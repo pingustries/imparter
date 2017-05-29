@@ -1,5 +1,5 @@
 ﻿using System;
-using Imparter.Messages;
+using System.Threading.Tasks;
 
 namespace Imparter.Cmd
 {
@@ -7,18 +7,17 @@ namespace Imparter.Cmd
     {
         static void Main(string[] args)
         {
-            var commandStore = new InMemoryCommandStore();
-            var eventStore = new InMemoryEventStore();
-            var sender = new CommandDispatcher(commandStore);
+            var commandQueue = new InMemoryQueue();
+            var eventQueue = new InMemoryQueue();
 
-            var service = new ImparterTestService(commandStore, eventStore);
+            var service = new ImparterTestService(commandQueue, eventQueue);
             service.Start();
-
-
-            var subscriber = new EventSubscriber(eventStore);
-            subscriber.Register<TestEvent>(Handle);
-            subscriber.Subscribe(0);
-
+            
+            var sender = new MessageDispatcher(commandQueue);
+            var eventHandlers = new HandlerResolver();
+            eventHandlers.Register<TestEvent>(Handle);
+            var eventSubscriber = new MessageSubscriber(eventQueue, eventHandlers);
+            eventSubscriber.Subscribe();
 
             while (true)
             {
@@ -28,14 +27,15 @@ namespace Imparter.Cmd
                 sender.Dispatch(new TestCommand(input)).GetAwaiter().GetResult();
             }
 
-            subscriber.Unsubscribe();
+            eventSubscriber.Unsubscribe();
             service.Stop();
             Console.WriteLine("DONE");
         }
 
-        private static void Handle(TestEvent ev)
+        private static Task Handle(TestEvent ev)
         {
             Console.WriteLine(ev.Value);
+            return Task.FromResult(0);
         }
     }
 }

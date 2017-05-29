@@ -1,6 +1,6 @@
 ﻿namespace Imparter
 {
-    public interface IEvent
+    public interface IMessage
     {
     }
 }

@@ -1,59 +1,35 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Imparter.Messages;
 
 namespace Imparter.Cmd
 {
     internal class ImparterTestService
     {
-        private readonly InMemoryCommandStore _store;
-        private Thread _thread;
-        private volatile bool _run;
-        private readonly HandlerResolver<ICommand> _handlerResolver;
-        private readonly EventDispatcher _eventDispatcher;
+        private readonly MessageSubscriber _commandSubscriber;
 
-        public ImparterTestService(InMemoryCommandStore store, InMemoryEventStore eventStore)
+        public ImparterTestService(InMemoryQueue commandQueue, InMemoryQueue eventQueue)
         {
-            _store = store;
-            _handlerResolver = new HandlerResolver<ICommand>();
-            _eventDispatcher = new EventDispatcher(eventStore);
-            _handlerResolver.Register<TestCommand>(async command => {
+            var eventDispatcher = new MessageDispatcher(eventQueue);
+
+            var handlerResolver = new HandlerResolver();
+            handlerResolver.Register<TestCommand>(async command => {
                 Console.WriteLine($"Got {command.Input}");
-                await _eventDispatcher.Dispatch(new TestEvent {Value = $"Event because of {command.Input}"});
+                await eventDispatcher.Dispatch(new TestEvent {Value = $"Event because of {command.Input}"});
             });
+            _commandSubscriber = new MessageSubscriber(commandQueue, handlerResolver);
             
         }
 
         public void Start()
         {
-            _thread = new Thread(async () => await StartProcessLoop());
-            _thread.Start();
+            _commandSubscriber.Subscribe();
         }
 
-        private async Task StartProcessLoop()
-        {
-            _run = true;
-            while (_run)
-            {
-                await ProcessStore();
-                Thread.Sleep(500);
-            }
-        }
-
-        private async Task ProcessStore()
-        {
-            ICommand command;
-            if (_store.TryDequeue(out command))
-            {
-                await _handlerResolver.Dispatch(command);
-            }
-        }
 
         public void Stop()
         {
-            _run = false;
-            _thread.Join();
+            _commandSubscriber.Unsubscribe();
         }
     }
 }

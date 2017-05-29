@@ -1,6 +1,6 @@
 ﻿namespace Imparter.Cmd
 {
-    internal class TestCommand : ICommand
+    internal class TestCommand : IMessage
     {
         public string Input { get; }
 

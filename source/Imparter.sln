@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter", "Imparter\Impart
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.Demo", "Imparter.Demo\Imparter.Demo.csproj", "{78BDBA95-EB60-4AF7-AF25-59D18696472C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.Sql", "Imparter.Sql\Imparter.Sql.csproj", "{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{78BDBA95-EB60-4AF7-AF25-59D18696472C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78BDBA95-EB60-4AF7-AF25-59D18696472C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78BDBA95-EB60-4AF7-AF25-59D18696472C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

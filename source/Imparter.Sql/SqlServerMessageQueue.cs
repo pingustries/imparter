@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -11,7 +9,7 @@ namespace Imparter.Sql
     public class SqlServerMessageQueue : IMessageQueue
     {
         private readonly string _connectionString;
-        private string _dequeueSql;
+        private readonly string _dequeueSql;
         private readonly string _enqueueSql;
 
         public SqlServerMessageQueue(string connectionString, string queueName)
@@ -41,8 +39,6 @@ ORDER BY Id)", queueName);
                 }
         }
 
-
-
         public async Task<IMessage> Dequeue()
         {
             string result = null;
@@ -59,6 +55,15 @@ ORDER BY Id)", queueName);
             if (string.IsNullOrEmpty(result))
                 return null;
             return Deserialize(result);
+        }
+
+        public static string GetCreateTableSql(string queueName)
+        {
+            return string.Format(@"
+CREATE TABLE {0}(
+    Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+    Data NVARCHAR(MAX));
+");
         }
 
         private string Serialize(IMessage message)

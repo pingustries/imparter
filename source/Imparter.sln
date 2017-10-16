@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter", "Imparter\Imparter.csproj", "{B167C10A-F568-417F-BD96-092F2FBE415F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imparter", "Imparter\Imparter.csproj", "{B167C10A-F568-417F-BD96-092F2FBE415F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.Demo", "Imparter.Demo\Imparter.Demo.csproj", "{78BDBA95-EB60-4AF7-AF25-59D18696472C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.Sql", "Imparter.Sql\Imparter.Sql.csproj", "{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imparter.Sql", "Imparter.Sql\Imparter.Sql.csproj", "{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{1087A055-3090-40E3-A6A8-25947B890136}"
 EndProject

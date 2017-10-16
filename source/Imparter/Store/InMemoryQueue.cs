@@ -22,8 +22,7 @@ namespace Imparter.Store
 
         public Task<IMessage> Dequeue()
         {
-            IMessage message = null;
-            _queue.TryDequeue(out message);
+            _queue.TryDequeue(out var message);
             return Task.FromResult(message);
         }
     }

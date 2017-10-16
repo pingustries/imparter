@@ -6,9 +6,9 @@ namespace Imparter
     {
         private readonly IChannelFactory _channelFactory;
 
-        public Imparter(IChannelFactory channelFactory)
+        public Imparter(IChannelFactory channelFactory = null)
         {
-            _channelFactory = channelFactory;
+            _channelFactory = channelFactory ?? new InMemoryChannelFactory();
         }
 
         public ImparterChannel GetImparterChannel(string channelName)

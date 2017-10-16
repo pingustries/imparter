@@ -2,7 +2,7 @@
 
 namespace Imparter.Store
 {
-    public class InMemoryMessageQueueFactory : IMessageQueueFactory
+    public class InMemoryChannelFactory : IChannelFactory
     {
         private static readonly ConcurrentDictionary<string, InMemoryQueue> Queues = new ConcurrentDictionary<string, InMemoryQueue>();
 

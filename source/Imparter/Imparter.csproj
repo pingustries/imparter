@@ -42,14 +42,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Handling\HandlerRegistration.cs" />
-    <Compile Include="MessageImparter.cs" />
+    <Compile Include="Imparter.cs" />
+    <Compile Include="ImparterChannel.cs" />
     <Compile Include="Handling\IHandle.cs" />
-    <Compile Include="MessageSubscriber.cs" />
+    <Compile Include="SubscriberChannel.cs" />
     <Compile Include="Handling\HandlerResolver.cs" />
     <Compile Include="IMessage.cs" />
     <Compile Include="Store\IMessageQueue.cs" />
-    <Compile Include="Store\IMessageQueueFactory.cs" />
-    <Compile Include="Store\InMemoryMessageQueueFactory.cs" />
+    <Compile Include="Store\IChannelFactory.cs" />
+    <Compile Include="Store\InMemoryChannelFactory.cs" />
     <Compile Include="Store\InMemoryQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -10,28 +10,35 @@ namespace Imparter.Demo
     {
         static void Main(string[] args)
         {
-            var messageQueueFactory = new SqlServerMessageQueueFactory(@"Data Source=(local)\sqlexpress;Initial Catalog=Imparter;Integrated Security=True");
+            var messageQueueFactory = new SqlServerChannelFactory(new SqlServerSettings
+            {
+                ConnectionString = @"Data Source=(localdb)\v11.0;Initial Catalog=ImparterTest;Integrated Security=True;Connect Timeout=30"
+            });
+            messageQueueFactory.EnsureChannelExists("commands");
+            messageQueueFactory.EnsureChannelExists("events");
 
-            var service = new ImparterTestService(messageQueueFactory);
+            var imparter = new Imparter(messageQueueFactory);
+            var service = new ImparterTestService(imparter);
             service.Start();
-            
-            var commandImparter = new MessageImparter(messageQueueFactory, "commands");
-            var eventHandlers = new HandlerResolver();
-            eventHandlers.Register<TestEvent>(Handle);
-            var eventSubscriber = new MessageSubscriber(messageQueueFactory, eventHandlers);
-            eventSubscriber.Subscribe("events");
+
+
+            var commandChannel = imparter.GetImparterChannel("commands");
+            var eventChannel = imparter.GetSubscriberChannel("events");
+            eventChannel.Register<TestEvent>(Handle);
+            eventChannel.Subscribe();
 
             while (true)
             {
                 var input = Console.ReadLine();
                 if (input == "q")
                     break;
-                commandImparter.Impart(new TestCommand(input)).GetAwaiter().GetResult();
+                commandChannel.Impart(new TestCommand(input)).GetAwaiter().GetResult();
             }
 
-            eventSubscriber.Unsubscribe();
+            eventChannel.Unsubscribe();
             service.Stop();
             Console.WriteLine("DONE");
+            Console.ReadKey();
         }
 
         private static Task Handle(TestEvent ev)

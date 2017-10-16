@@ -1,26 +1,27 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Imparter.Handling;
 using Imparter.Store;
 
 namespace Imparter
 {
-    public class MessageSubscriber
+    public class SubscriberChannel
     {
-        private readonly IMessageQueueFactory _queueFactory;
+        private readonly IMessageQueue _queue;
         private readonly HandlerResolver _handlers;
         private CancellationTokenSource _tokenSource;
 
-        public MessageSubscriber(IMessageQueueFactory queueFactory, HandlerResolver handlers)
+        public SubscriberChannel(IMessageQueue queue)
         {
-            _queueFactory = queueFactory;
-            _handlers = handlers;
+            _queue = queue;
+            _handlers = new HandlerResolver();
         }
 
-        public void Subscribe(string queueName)
+        public void Subscribe()
         {
             _tokenSource = new CancellationTokenSource();
-            Task.Factory.StartNew(() => StartProcessLoop(queueName, _tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            Task.Factory.StartNew(() => StartProcessLoop(_tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         public void Unsubscribe()
@@ -28,14 +29,18 @@ namespace Imparter
             _tokenSource.Cancel();
         }
 
-        private async Task StartProcessLoop(string queueName, CancellationToken tokenSourceToken)
+        public void Register<T>(Func<T, Task> handler) where T : class, IMessage
         {
-            var queue = _queueFactory.Get(queueName);
+            _handlers.Register(handler);
+        }
+
+        private async Task StartProcessLoop(CancellationToken tokenSourceToken)
+        {
             while (!tokenSourceToken.IsCancellationRequested)
             {
                 do
                 {
-                    IMessage message = await queue.Dequeue();
+                    IMessage message = await _queue.Dequeue();
                     if (message == null)
                         break;
                     foreach (var handler in _handlers.Resolve(message))

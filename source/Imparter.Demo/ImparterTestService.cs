@@ -1,33 +1,31 @@
 using System;
-using Imparter.Handling;
-using Imparter.Store;
 
 namespace Imparter.Demo
 {
     internal class ImparterTestService
     {
-        private readonly MessageSubscriber _commandSubscriber;
+        private readonly SubscriberChannel _incommingCommandsChannel;
 
-        public ImparterTestService(IMessageQueueFactory messageQueueFactory)
+        public ImparterTestService(Imparter imparter)
         {
-            var eventImparter = new MessageImparter(messageQueueFactory, "events");
+            var outgoingEventsChannel = imparter.GetImparterChannel("events");
+            _incommingCommandsChannel = imparter.GetSubscriberChannel("commands");
 
-            var handlerResolver = new HandlerResolver();
-            handlerResolver.Register<TestCommand>(async command => {
+
+            _incommingCommandsChannel.Register<TestCommand>(async command => {
                 Console.WriteLine($"Got {command.Input}");
-                await eventImparter.Impart(new [] { new TestEvent {Value = $"Event because of {command.Input}"}});
+                await outgoingEventsChannel.Impart(new TestEvent {Value = $"Event because of {command.Input}"});
             });
-            _commandSubscriber = new MessageSubscriber(messageQueueFactory, handlerResolver);
         }
 
         public void Start()
         {
-            _commandSubscriber.Subscribe("commands");
+            _incommingCommandsChannel.Subscribe();
         }
         
         public void Stop()
         {
-            _commandSubscriber.Unsubscribe();
+            _incommingCommandsChannel.Unsubscribe();
         }
     }
 }

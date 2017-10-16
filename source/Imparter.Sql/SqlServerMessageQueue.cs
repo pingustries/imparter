@@ -57,15 +57,6 @@ ORDER BY Id)", queueName);
             return Deserialize(result);
         }
 
-        public static string GetCreateTableSql(string queueName)
-        {
-            return string.Format(@"
-CREATE TABLE {0}(
-    Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
-    Data NVARCHAR(MAX));
-");
-        }
-
         private string Serialize(IMessage message)
         {
             return JsonConvert.SerializeObject(message, typeof(IMessage), SerializerSettings);

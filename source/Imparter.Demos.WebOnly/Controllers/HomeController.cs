@@ -11,7 +11,6 @@ namespace Imparter.Demos.WebOnly.Controllers
         public HomeController()
         {
             _todoStore = new TodoStore();
-            _messageImparter = new MessageImparter
         }
 
         [HttpGet]

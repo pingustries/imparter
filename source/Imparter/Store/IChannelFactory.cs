@@ -1,6 +1,6 @@
 ﻿namespace Imparter.Store
 {
-    public interface IMessageQueueFactory
+    public interface IChannelFactory
     {
         IMessageQueue Get(string name);
     }

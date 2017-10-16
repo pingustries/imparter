@@ -45,13 +45,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ISqlServerSettings.cs" />
+    <Compile Include="IMessageTypeResolver.cs" />
+    <Compile Include="ISqlServerOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlChannelCreator.cs" />
     <Compile Include="SqlExecutor.cs" />
     <Compile Include="SqlServerMessageQueue.cs" />
     <Compile Include="SqlServerChannelFactory.cs" />
-    <Compile Include="SqlServerSettings.cs" />
+    <Compile Include="SqlServerOptions.cs" />
+    <Compile Include="SimpleMessageTypeResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Imparter\Imparter.csproj">

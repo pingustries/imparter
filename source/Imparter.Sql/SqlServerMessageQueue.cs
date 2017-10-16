@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -6,28 +7,31 @@ using Newtonsoft.Json;
 
 namespace Imparter.Sql
 {
-    public class SqlServerMessageQueue : IMessageQueue
+    internal class SqlServerMessageQueue : IMessageQueue
     {
+        private readonly IMessageTypeResolver _messageTypeResolver;
         private readonly string _connectionString;
         private readonly string _dequeueSql;
         private readonly string _enqueueSql;
 
-        public SqlServerMessageQueue(string connectionString, string queueName)
+        public SqlServerMessageQueue(IMessageTypeResolver messageTypeResolver, string connectionString, string queueName)
         {
+            _messageTypeResolver = messageTypeResolver;
             _connectionString = connectionString; 
             _dequeueSql = string.Format(@"
 DELETE TOP(1) FROM {0}
-OUTPUT DELETED.Data
+OUTPUT DELETED.MessageType, DELETED.Data
 WHERE Id = (
 SELECT TOP(1) Id
   FROM {0} WITH (ROWLOCK, UPDLOCK, READPAST)
 ORDER BY Id)", queueName);
 
-            _enqueueSql = $"INSERT INTO {queueName}(Data) VALUES(@data)";
+            _enqueueSql = $"INSERT INTO {queueName}(Data, MessageType) VALUES(@data, @messageType)";
         }
 
         public async Task Enqueue(IMessage message)
         {
+            var type = _messageTypeResolver.GetMessageName(message.GetType());
             var serialized = Serialize(message);
 
             using (var connection = CreateConnection())
@@ -35,13 +39,14 @@ ORDER BY Id)", queueName);
                 {
                     cmd.CommandText = _enqueueSql;
                     cmd.Parameters.Add("@data", SqlDbType.NVarChar).Value = serialized;
+                    cmd.Parameters.Add("@messageType", SqlDbType.NVarChar).Value = type;
                     await cmd.ExecuteNonQueryAsync();
                 }
         }
 
         public async Task<IMessage> Dequeue()
         {
-            string result = null;
+            MessagedataAndType result = null;
             using(var connection = CreateConnection())
             using (var cmd = connection.CreateCommand())
             {
@@ -49,10 +54,13 @@ ORDER BY Id)", queueName);
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     if (reader.Read())
-                        result = reader.GetString(0);
+                    {
+                        result = new MessagedataAndType{Data = reader.GetString(1), Type = reader.GetString(0)};
+                    }
+                        
                 }
             }
-            if (string.IsNullOrEmpty(result))
+            if (result == null)
                 return null;
             return Deserialize(result);
         }
@@ -62,9 +70,10 @@ ORDER BY Id)", queueName);
             return JsonConvert.SerializeObject(message, typeof(IMessage), SerializerSettings);
         }
 
-        private IMessage Deserialize(string raw)
+        private IMessage Deserialize(MessagedataAndType messagedataAndType)
         {
-            return JsonConvert.DeserializeObject<IMessage>(raw, SerializerSettings);
+            var type = _messageTypeResolver.GetMessageType(messagedataAndType.Type);
+            return JsonConvert.DeserializeObject(messagedataAndType.Data, type, SerializerSettings) as IMessage;
         }
 
         private SqlConnection CreateConnection()
@@ -77,7 +86,13 @@ ORDER BY Id)", queueName);
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.Auto
+            TypeNameHandling = TypeNameHandling.None
         };
+
+        private class MessagedataAndType
+        {
+            public string Data { get; set; }
+            public string Type { get; set; }
+        }
     }
 }

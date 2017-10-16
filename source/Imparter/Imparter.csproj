@@ -44,7 +44,8 @@
     <Compile Include="Handling\HandlerRegistration.cs" />
     <Compile Include="Imparter.cs" />
     <Compile Include="ImparterChannel.cs" />
-    <Compile Include="Handling\IHandle.cs" />
+    <Compile Include="IHandle.cs" />
+    <Compile Include="ImparterOptions.cs" />
     <Compile Include="SubscriberChannel.cs" />
     <Compile Include="Handling\HandlerResolver.cs" />
     <Compile Include="IMessage.cs" />

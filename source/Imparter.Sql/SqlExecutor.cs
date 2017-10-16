@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace Imparter.Sql
 {
-    public class SqlExecutor
+    internal class SqlExecutor
     {
-        private readonly ISqlServerSettings _settings;
+        private readonly string _connectionString;
 
-        public SqlExecutor(ISqlServerSettings settings)
+        public SqlExecutor(string connectionString)
         {
-            _settings = settings;
+            _connectionString = connectionString;
         }
 
         public async Task ExecuteNonQuery(string sql, params SqlParameter[] parameters)
@@ -25,7 +25,7 @@ namespace Imparter.Sql
 
         private SqlConnection CreateConnection()
         {
-            var connection = new SqlConnection(_settings.ConnectionString);
+            var connection = new SqlConnection(_connectionString);
             connection.Open();
             return connection;
         }

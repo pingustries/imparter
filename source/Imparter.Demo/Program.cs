@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Imparter.Handling;
 using Imparter.Sql;
-using Imparter.Store;
 
 namespace Imparter.Demo
 {
@@ -10,14 +8,13 @@ namespace Imparter.Demo
     {
         static void Main(string[] args)
         {
-            var messageQueueFactory = new SqlServerChannelFactory(new SqlServerSettings
-            {
-                ConnectionString = @"Data Source=(localdb)\v11.0;Initial Catalog=ImparterTest;Integrated Security=True;Connect Timeout=30"
-            });
+            var messageQueueFactory = new SqlServerChannelFactory(new SqlServerOptions(@"Data Source=(localdb)\v11.0;Initial Catalog=ImparterTest;Integrated Security=True;Connect Timeout=30"));
             messageQueueFactory.EnsureChannelExists("commands");
             messageQueueFactory.EnsureChannelExists("events");
 
-            var imparter = new Imparter(messageQueueFactory);
+            var imparter = new Imparter(new ImparterOptions{ChannelFactory = messageQueueFactory});
+
+
             var service = new ImparterTestService(imparter);
             service.Start();
 
@@ -38,7 +35,6 @@ namespace Imparter.Demo
             eventChannel.Unsubscribe();
             service.Stop();
             Console.WriteLine("DONE");
-            Console.ReadKey();
         }
 
         private static Task Handle(TestEvent ev)

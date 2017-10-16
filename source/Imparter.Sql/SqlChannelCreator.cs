@@ -12,9 +12,9 @@ namespace Imparter.Sql
     {
         private readonly SqlExecutor _sqlExecutor;
 
-        public SqlChannelCreator(ISqlServerSettings settings)
+        public SqlChannelCreator(string connectionString)
         {
-            _sqlExecutor = new SqlExecutor(settings);
+            _sqlExecutor = new SqlExecutor(connectionString);
         }
 
         public async Task CreateIfNotExists(string channelName)
@@ -24,6 +24,9 @@ IF OBJECT_ID('{channelName}', 'U') IS NULL
 BEGIN
 CREATE TABLE {channelName}(
     Id INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    MessageType NVARCHAR(512) NOT NULL,
+    Tries INT NOT NULL DEFAULT 1,
+    Timeout DateTime NULL,
     Data NVARCHAR(MAX));
 END
 ";

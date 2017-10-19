@@ -5,14 +5,14 @@ namespace Imparter.Handling
 {
     class HandlerRegistration
     {
-        public HandlerRegistration(Type eventType, string handlerType, Func<IMessage, Task> handler)
+        public HandlerRegistration(Type eventType, string handlerType, Func<object, Task> handler)
         {
             EventType = eventType;
             HandlerType = handlerType;
             Handler = handler;
         }
 
-        public Func<IMessage, Task> Handler { get; }
+        public Func<object, Task> Handler { get; }
 
         public Type EventType { get;}
         public string HandlerType { get; }

@@ -29,7 +29,7 @@ namespace Imparter
             _tokenSource.Cancel();
         }
 
-        public void Register<T>(Func<T, Task> handler) where T : class, IMessage
+        public void Register<T>(Func<T, Task> handler) where T : class
         {
             _handlers.Register(handler);
         }
@@ -40,7 +40,7 @@ namespace Imparter
             {
                 do
                 {
-                    IMessage message = await _queue.Dequeue();
+                    object message = await _queue.Dequeue();
                     if (message == null)
                         break;
                     foreach (var handler in _handlers.Resolve(message))

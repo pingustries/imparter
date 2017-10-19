@@ -2,7 +2,7 @@
 
 namespace Imparter
 {
-    public interface IHandle<in T> where T : class, IMessage
+    public interface IHandle<in T> where T : class
     {
         Task Handle(T message);
     }

@@ -1,6 +1,6 @@
 ﻿namespace Imparter.Demo
 {
-    internal class TestCommand : IMessage
+    internal class TestCommand 
     {
         public string Input { get; }
 

@@ -4,7 +4,7 @@ namespace Imparter.Store
 {
     public interface IMessageQueue
     {
-        Task Enqueue(IMessage message);
-        Task<IMessage> Dequeue();
+        Task Enqueue(object message);
+        Task<object> Dequeue();
     }
 }

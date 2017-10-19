@@ -1,4 +1,3 @@
-using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -29,7 +28,7 @@ ORDER BY Id)", queueName);
             _enqueueSql = $"INSERT INTO {queueName}(Data, MessageType) VALUES(@data, @messageType)";
         }
 
-        public async Task Enqueue(IMessage message)
+        public async Task Enqueue(object message)
         {
             var type = _messageTypeResolver.GetMessageName(message.GetType());
             var serialized = Serialize(message);
@@ -44,7 +43,7 @@ ORDER BY Id)", queueName);
                 }
         }
 
-        public async Task<IMessage> Dequeue()
+        public async Task<object> Dequeue()
         {
             MessagedataAndType result = null;
             using(var connection = CreateConnection())
@@ -65,15 +64,15 @@ ORDER BY Id)", queueName);
             return Deserialize(result);
         }
 
-        private string Serialize(IMessage message)
+        private string Serialize(object message)
         {
-            return JsonConvert.SerializeObject(message, typeof(IMessage), SerializerSettings);
+            return JsonConvert.SerializeObject(message, typeof(object), SerializerSettings);
         }
 
-        private IMessage Deserialize(MessagedataAndType messagedataAndType)
+        private object Deserialize(MessagedataAndType messagedataAndType)
         {
             var type = _messageTypeResolver.GetMessageType(messagedataAndType.Type);
-            return JsonConvert.DeserializeObject(messagedataAndType.Data, type, SerializerSettings) as IMessage;
+            return JsonConvert.DeserializeObject(messagedataAndType.Data, type, SerializerSettings);
         }
 
         private SqlConnection CreateConnection()

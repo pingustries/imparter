@@ -12,7 +12,7 @@ namespace Imparter
             _messageQueue = messageQueue;
         }
 
-        public async Task Impart(IMessage message)
+        public async Task Impart(object message)
         {
             await _messageQueue.Enqueue(message);
         }

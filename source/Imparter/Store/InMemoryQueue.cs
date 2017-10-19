@@ -4,14 +4,15 @@ using System.Threading.Tasks;
 namespace Imparter.Store
 {
     public class InMemoryQueue : IMessageQueue
-    {        
+    {
+        private static readonly ConcurrentDictionary<string, ConcurrentQueue<object>> Queues = new ConcurrentDictionary<string, ConcurrentQueue<object>>();
         private readonly string _name;
         private readonly ConcurrentQueue<object> _queue;
 
         internal InMemoryQueue(string name)
         {
             _name = name;
-            _queue = new ConcurrentQueue<object>();
+            _queue = Queues.GetOrAdd(name, n => new ConcurrentQueue<object>());
         }
 
         public Task Enqueue(object message)

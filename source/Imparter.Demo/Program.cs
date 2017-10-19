@@ -12,15 +12,14 @@ namespace Imparter.Demo
             messageQueueFactory.EnsureChannelExists("commands");
             messageQueueFactory.EnsureChannelExists("events");
 
-            var imparter = new Imparter(new ImparterOptions{ChannelFactory = messageQueueFactory});
+            var imparterChannels = new ImparterChannels{ChannelFactory = messageQueueFactory};
 
-
-            var service = new ImparterTestService(imparter);
+            var service = new ImparterTestService(imparterChannels);
             service.Start();
 
 
-            var commandChannel = imparter.GetImparterChannel("commands");
-            var eventChannel = imparter.GetSubscriberChannel("events");
+            var commandChannel = imparterChannels.GetImparterChannel("commands");
+            var eventChannel = imparterChannels.GetSubscriberChannel("events");
             eventChannel.Register<TestEvent>(Handle);
             eventChannel.Subscribe();
 

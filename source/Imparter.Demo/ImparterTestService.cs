@@ -6,10 +6,10 @@ namespace Imparter.Demo
     {
         private readonly SubscriberChannel _incommingCommandsChannel;
 
-        public ImparterTestService(Imparter imparter)
+        public ImparterTestService(ImparterChannels imparterChannels)
         {
-            var outgoingEventsChannel = imparter.GetImparterChannel("events");
-            _incommingCommandsChannel = imparter.GetSubscriberChannel("commands");
+            var outgoingEventsChannel = imparterChannels.GetImparterChannel("events");
+            _incommingCommandsChannel = imparterChannels.GetSubscriberChannel("commands");
 
 
             _incommingCommandsChannel.Register<TestCommand>(async command => {

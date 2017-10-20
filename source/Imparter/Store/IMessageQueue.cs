@@ -6,5 +6,6 @@ namespace Imparter.Store
     {
         Task Enqueue(object message);
         Task<object> Dequeue();
+        string Name { get; }
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace Imparter.Demo
 {
     internal class ImparterTestService
@@ -8,14 +6,9 @@ namespace Imparter.Demo
 
         public ImparterTestService(ImparterChannels imparterChannels)
         {
-            var outgoingEventsChannel = imparterChannels.GetImparterChannel("events");
+            var commandHandler = new TestCommandHandler(imparterChannels);
             _incommingCommandsChannel = imparterChannels.GetSubscriberChannel("commands");
-
-
-            _incommingCommandsChannel.Register<TestCommand>(async command => {
-                Console.WriteLine($"Got {command.Input}");
-                await outgoingEventsChannel.Impart(new TestEvent {Value = $"Event because of {command.Input}"});
-            });
+            _incommingCommandsChannel.Register<TestCommand>(commandHandler.Handle);
         }
 
         public void Start()

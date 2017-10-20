@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using NLog;
 
 namespace Imparter.Sql
 {
     public class SqlChannelCreator
     {
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly SqlExecutor _sqlExecutor;
 
         public SqlChannelCreator(string connectionString)
@@ -28,17 +24,18 @@ CREATE TABLE {channelName}(
     Tries INT NOT NULL DEFAULT 1,
     Timeout DateTime NULL,
     Data NVARCHAR(MAX));
+    SELECT 1;
+END
+ELSE
+BEGIN
+    SELECT 0;
 END
 ";
-            await _sqlExecutor.ExecuteNonQuery(sql);
-        }
-
-        public Task DoAQuery()
-        {
-            var sql = @"IF OBJECT_ID('@channelName', 'U') IS NULL";
-            var param = new SqlParameter("channelName", SqlDbType.NVarChar);
-            param.Value = "ello";
-            return _sqlExecutor.ExecuteNonQuery(sql, param);
+            var wasCreated = await _sqlExecutor.ExecuteNonQuery(sql);
+            if (wasCreated)
+                _logger.Info($"Queue table '{channelName}' was created");
+            else
+                _logger.Debug($"Queue table '{channelName}' already exists");
         }
     }
 }

@@ -12,14 +12,15 @@ namespace Imparter.Sql
             _connectionString = connectionString;
         }
 
-        public async Task ExecuteNonQuery(string sql, params SqlParameter[] parameters)
+        public async Task<bool> ExecuteNonQuery(string sql, params SqlParameter[] parameters)
         {
             using (var connection = CreateConnection())
             using (var cmd = connection.CreateCommand())
             {
                 cmd.Parameters.AddRange(parameters);
                 cmd.CommandText = sql;
-                await cmd.ExecuteNonQueryAsync();
+                var result  = await cmd.ExecuteScalarAsync();
+                return ((int) result) == 1;
             }
         }
 

@@ -3,29 +3,27 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Imparter.Store;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Imparter.Sql
 {
     internal class SqlServerMessageQueue : IMessageQueue
     {
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IMessageTypeResolver _messageTypeResolver;
         private readonly string _connectionString;
         private readonly string _dequeueSql;
         private readonly string _enqueueSql;
 
+        public string Name { get; }
+
         public SqlServerMessageQueue(IMessageTypeResolver messageTypeResolver, string connectionString, string queueName)
         {
+            Name = queueName;
             _messageTypeResolver = messageTypeResolver;
             _connectionString = connectionString; 
-            _dequeueSql = string.Format(@"
-DELETE TOP(1) FROM {0}
-OUTPUT DELETED.MessageType, DELETED.Data
-WHERE Id = (
-SELECT TOP(1) Id
-  FROM {0} WITH (ROWLOCK, UPDLOCK, READPAST)
-ORDER BY Id)", queueName);
-
-            _enqueueSql = $"INSERT INTO {queueName}(Data, MessageType) VALUES(@data, @messageType)";
+            _dequeueSql = GetDequeueSql(queueName);
+            _enqueueSql = GetEnqueueSql(queueName);
         }
 
         public async Task Enqueue(object message)
@@ -55,6 +53,7 @@ ORDER BY Id)", queueName);
                     if (reader.Read())
                     {
                         result = new MessagedataAndType{Data = reader.GetString(1), Type = reader.GetString(0)};
+                        _logger.Trace($"Read message from queue: '{result}'");
                     }
                         
                 }
@@ -72,7 +71,8 @@ ORDER BY Id)", queueName);
         private object Deserialize(MessagedataAndType messagedataAndType)
         {
             var type = _messageTypeResolver.GetMessageType(messagedataAndType.Type);
-            return JsonConvert.DeserializeObject(messagedataAndType.Data, type, SerializerSettings);
+            var deserialized = JsonConvert.DeserializeObject(messagedataAndType.Data, type, SerializerSettings);
+            return deserialized;
         }
 
         private SqlConnection CreateConnection()
@@ -88,10 +88,31 @@ ORDER BY Id)", queueName);
             TypeNameHandling = TypeNameHandling.None
         };
 
+        private static string GetEnqueueSql(string queueName)
+        {
+            return $"INSERT INTO {queueName}(Data, MessageType) VALUES(@data, @messageType)";
+        }
+
+        private static string GetDequeueSql(string queueName)
+        {
+            return string.Format(@"
+DELETE TOP(1) FROM {0}
+OUTPUT DELETED.MessageType, DELETED.Data
+WHERE Id = (
+SELECT TOP(1) Id
+  FROM {0} WITH (ROWLOCK, UPDLOCK, READPAST)
+ORDER BY Id)", queueName);
+        }
+
         private class MessagedataAndType
         {
             public string Data { get; set; }
             public string Type { get; set; }
+
+            public override string ToString()
+            {
+                return string.Format("Data: '{0}', Type: '{1}'", Data, Type);
+            }
         }
     }
 }

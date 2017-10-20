@@ -6,12 +6,13 @@ namespace Imparter.Store
     public class InMemoryQueue : IMessageQueue
     {
         private static readonly ConcurrentDictionary<string, ConcurrentQueue<object>> Queues = new ConcurrentDictionary<string, ConcurrentQueue<object>>();
-        private readonly string _name;
         private readonly ConcurrentQueue<object> _queue;
+
+        public string Name { get; }
 
         internal InMemoryQueue(string name)
         {
-            _name = name;
+            Name = name;
             _queue = Queues.GetOrAdd(name, n => new ConcurrentQueue<object>());
         }
 
@@ -26,5 +27,7 @@ namespace Imparter.Store
             _queue.TryDequeue(out var message);
             return Task.FromResult(message);
         }
+
+
     }
 }

@@ -3,11 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Imparter.Handling;
 using Imparter.Store;
+using NLog;
 
 namespace Imparter
 {
     public class SubscriberChannel
     {
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IMessageQueue _queue;
         private readonly HandlerResolver _handlers;
         private CancellationTokenSource _tokenSource;
@@ -21,11 +23,12 @@ namespace Imparter
         public void Subscribe()
         {
             _tokenSource = new CancellationTokenSource();
-            Task.Factory.StartNew(() => StartProcessLoop(_tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            Task.Factory.StartNew(() => RunProcessLoop(_tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         public void Unsubscribe()
         {
+            _logger.Debug($"Unsubscribing from {_queue.Name}");
             _tokenSource.Cancel();
         }
 
@@ -34,22 +37,30 @@ namespace Imparter
             _handlers.Register(handler);
         }
 
-        private async Task StartProcessLoop(CancellationToken tokenSourceToken)
+        private async Task RunProcessLoop(CancellationToken tokenSourceToken)
         {
-            while (!tokenSourceToken.IsCancellationRequested)
+            try
             {
-                do
+                _logger.Debug($"Starting listening for messages on '{_queue.Name}'");
+                while (!tokenSourceToken.IsCancellationRequested)
                 {
-                    object message = await _queue.Dequeue();
-                    if (message == null)
-                        break;
-                    foreach (var handler in _handlers.Resolve(message))
+                    do
                     {
-                        await handler(message);
-                    }
-                    
-                } while (true);
-                await Task.Delay(500, tokenSourceToken);
+                        object message = await _queue.Dequeue();
+                        if (message == null)
+                            break;
+                        foreach (var handler in _handlers.Resolve(message))
+                        {
+                            await handler(message);
+                        }
+
+                    } while (true);
+                    await Task.Delay(500, tokenSourceToken);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Exception in processing loop");
             }
         }
     }

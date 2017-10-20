@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" Version="5.0.0-beta11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Imparter.Sql\Imparter.Sql.csproj" />
     <ProjectReference Include="..\Imparter\Imparter.csproj" />
   </ItemGroup>

@@ -6,14 +6,14 @@ namespace Imparter.Sql
     {
         private readonly ISqlServerOptions _settings;
 
-        public SqlServerChannelFactory(ISqlServerOptions settings)
+        public SqlServerChannelFactory(ISqlServerOptions settings) : base(settings.MessageTypeResolver, settings.MessageSerializer)
         {
             _settings = settings;
         }
 
         protected override IMessageQueue Get(string name)
         {
-            return new SqlServerMessageQueue(_settings.MessageTypeResolver, _settings.ConnectionString, name);
+            return new SqlServerMessageQueue(_settings.ConnectionString, name);
         }
 
         public void EnsureChannelExists(string channelName)

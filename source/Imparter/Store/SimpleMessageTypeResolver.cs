@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Imparter.Sql
+namespace Imparter.Store
 {
-    internal class SimpleMessageTypeResolver : IMessageTypeResolver
+    public class SimpleMessageTypeResolver : IMessageTypeResolver
     {
         public Type GetMessageType(string typeName)
         {

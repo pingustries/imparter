@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Imparter.Sql
+namespace Imparter.Store
 {
     public interface IMessageTypeResolver
     {

@@ -19,10 +19,11 @@ namespace Imparter.Sql
 IF OBJECT_ID('{channelName}', 'U') IS NULL
 BEGIN
 CREATE TABLE {channelName}(
-    Id INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    Id BIGINT NOT NULL PRIMARY KEY IDENTITY(1, 1),
     MessageType NVARCHAR(512) NOT NULL,
-    Tries INT NOT NULL DEFAULT 1,
-    Timeout DateTime NULL,
+    Tries INT NOT NULL,
+    TimeoutUtc DateTime NULL,
+    IsStopped bit NOT NULL,
     Data NVARCHAR(MAX));
     SELECT 1;
 END

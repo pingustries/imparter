@@ -11,13 +11,17 @@ namespace Imparter
     {
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IMessageQueue _queue;
+        private readonly IMessageTypeResolver _messageTypeResolver;
+        private readonly IMessageSerializer _serializer;
         private readonly HandlerResolver _handlers;
         private CancellationTokenSource _tokenSource;
         private Task<Task> _task;
 
-        public PollingSubscriberChannel(IMessageQueue queue)
+        public PollingSubscriberChannel(IMessageQueue queue, IMessageTypeResolver messageTypeResolver, IMessageSerializer serializer)
         {
             _queue = queue;
+            _messageTypeResolver = messageTypeResolver;
+            _serializer = serializer;
             _handlers = new HandlerResolver();
         }
 
@@ -47,22 +51,26 @@ namespace Imparter
 
         private async Task RunProcessLoop(CancellationToken tokenSourceToken)
         {
+            _logger.Debug($"Starting listening for messages on '{_queue.Name}'");
             try
             {
-                _logger.Debug($"Starting listening for messages on '{_queue.Name}'");
                 while (!tokenSourceToken.IsCancellationRequested)
                 {
                     do
                     {
-                        object message = await _queue.Dequeue();
-                        if (message == null)
+                        MessageAndMetadata messageAndMetadata = await _queue.Dequeue();
+                        if (messageAndMetadata == null)
                             break;
+
+                        var messageType = _messageTypeResolver.GetMessageType(messageAndMetadata.Metadata.MessageType);
+                        var message = _serializer.Deserialize(messageType, messageAndMetadata.MessageRaw);
+
                         foreach (var handler in _handlers.Resolve(message))
                         {
                             await handler(message);
                         }
 
-                    } while (true);
+                    } while (!tokenSourceToken.IsCancellationRequested);
                     await Task.Delay(500, tokenSourceToken);
                 }
             }

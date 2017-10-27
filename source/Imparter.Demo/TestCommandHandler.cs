@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Imparter.Store;
 using NLog;
 
 namespace Imparter.Demo
@@ -8,7 +9,7 @@ namespace Imparter.Demo
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly ImparterChannel _eventChannel;
 
-        public TestCommandHandler(ImparterChannels imparterChannels)
+        public TestCommandHandler(IChannelFactory imparterChannels)
         {
             _eventChannel = imparterChannels.GetImparterChannel("events");
         }

@@ -1,8 +1,8 @@
 ﻿namespace Imparter.Store
 {
-    public class InMemoryChannelFactory : IChannelFactory
+    public class InMemoryChannelFactory : ChannelFactoryBase
     {
-        public IMessageQueue Get(string name)
+        protected override IMessageQueue Get(string name)
         {
             return new InMemoryQueue(name);
         }

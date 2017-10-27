@@ -2,7 +2,7 @@
 
 namespace Imparter.Sql
 {
-    public class SqlServerChannelFactory : IChannelFactory
+    public class SqlServerChannelFactory : ChannelFactoryBase
     {
         private readonly ISqlServerOptions _settings;
 
@@ -11,7 +11,7 @@ namespace Imparter.Sql
             _settings = settings;
         }
 
-        public IMessageQueue Get(string name)
+        protected override IMessageQueue Get(string name)
         {
             return new SqlServerMessageQueue(_settings.MessageTypeResolver, _settings.ConnectionString, name);
         }

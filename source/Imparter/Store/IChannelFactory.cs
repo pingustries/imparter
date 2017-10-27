@@ -2,6 +2,7 @@
 {
     public interface IChannelFactory
     {
-        IMessageQueue Get(string name);
+        ImparterChannel GetImparterChannel(string channelName);
+        SubscriberChannel GetSubscriberChannel(string channelName);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Imparter.Sql;
+using Imparter.Store;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -35,15 +36,14 @@ namespace Imparter.Demo
             Console.WriteLine("DONE");
         }
 
-        private static ImparterChannels InitImparter()
+        private static IChannelFactory InitImparter()
         {
             var messageQueueFactory = new SqlServerChannelFactory(new SqlServerOptions(
                 @"Data Source=(localdb)\v11.0;Initial Catalog=ImparterTest;Integrated Security=True;Connect Timeout=30"));
             messageQueueFactory.EnsureChannelExists("commands");
             messageQueueFactory.EnsureChannelExists("events");
 
-            var imparterChannels = new ImparterChannels {ChannelFactory = messageQueueFactory};
-            return imparterChannels;
+            return messageQueueFactory;
         }
 
         private static void InitLogging()

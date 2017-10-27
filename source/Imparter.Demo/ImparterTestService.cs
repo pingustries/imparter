@@ -1,10 +1,12 @@
+using Imparter.Store;
+
 namespace Imparter.Demo
 {
     internal class ImparterTestService
     {
         private readonly SubscriberChannel _incommingCommandsChannel;
 
-        public ImparterTestService(ImparterChannels imparterChannels)
+        public ImparterTestService(IChannelFactory imparterChannels)
         {
             var commandHandler = new TestCommandHandler(imparterChannels);
             _incommingCommandsChannel = imparterChannels.GetSubscriberChannel("commands");

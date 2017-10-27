@@ -3,7 +3,7 @@ using Imparter.Store;
 
 namespace Imparter
 {
-    public class ImparterChannel
+    internal class ImparterChannel : IImparterChannel
     {
         private readonly IMessageQueue _messageQueue;
 

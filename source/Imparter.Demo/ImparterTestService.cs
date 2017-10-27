@@ -4,7 +4,7 @@ namespace Imparter.Demo
 {
     internal class ImparterTestService
     {
-        private readonly SubscriberChannel _incommingCommandsChannel;
+        private readonly ISubscriberChannel _incommingCommandsChannel;
 
         public ImparterTestService(IChannelFactory imparterChannels)
         {

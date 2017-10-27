@@ -4,14 +4,14 @@
     {
         protected abstract IMessageQueue Get(string name);
 
-        public ImparterChannel GetImparterChannel(string channelName)
+        public IImparterChannel GetImparterChannel(string channelName)
         {
             return new ImparterChannel(Get(channelName));
         }
 
-        public SubscriberChannel GetSubscriberChannel(string channelName)
+        public ISubscriberChannel GetSubscriberChannel(string channelName)
         {
-            return new SubscriberChannel(Get(channelName));
+            return new PollingSubscriberChannel(Get(channelName));
         }
     }
 }

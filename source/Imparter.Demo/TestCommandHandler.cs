@@ -7,7 +7,7 @@ namespace Imparter.Demo
     class TestCommandHandler
     {
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-        private readonly ImparterChannel _eventChannel;
+        private readonly IImparterChannel _eventChannel;
 
         public TestCommandHandler(IChannelFactory imparterChannels)
         {

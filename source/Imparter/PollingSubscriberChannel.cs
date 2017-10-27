@@ -7,14 +7,15 @@ using NLog;
 
 namespace Imparter
 {
-    public class SubscriberChannel
+    internal class PollingSubscriberChannel : ISubscriberChannel
     {
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IMessageQueue _queue;
         private readonly HandlerResolver _handlers;
         private CancellationTokenSource _tokenSource;
+        private Task<Task> _task;
 
-        public SubscriberChannel(IMessageQueue queue)
+        public PollingSubscriberChannel(IMessageQueue queue)
         {
             _queue = queue;
             _handlers = new HandlerResolver();
@@ -22,14 +23,21 @@ namespace Imparter
 
         public void Subscribe()
         {
+            if (_tokenSource != null)
+            {
+                _tokenSource.Cancel();
+                (_task ?? Task.CompletedTask).GetAwaiter().GetResult();
+            }
             _tokenSource = new CancellationTokenSource();
-            Task.Factory.StartNew(() => RunProcessLoop(_tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            _task = Task.Factory.StartNew(() => RunProcessLoop(_tokenSource.Token), _tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
-        public void Unsubscribe()
+        public async Task Unsubscribe()
         {
             _logger.Debug($"Unsubscribing from {_queue.Name}");
             _tokenSource.Cancel();
+            await _task;
+            _task = null;
         }
 
         public void Register<T>(Func<T, Task> handler) where T : class

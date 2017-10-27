@@ -2,7 +2,7 @@
 {
     public interface IChannelFactory
     {
-        ImparterChannel GetImparterChannel(string channelName);
-        SubscriberChannel GetSubscriberChannel(string channelName);
+        IImparterChannel GetImparterChannel(string channelName);
+        ISubscriberChannel GetSubscriberChannel(string channelName);
     }
 }

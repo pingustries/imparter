@@ -1,4 +1,4 @@
-﻿namespace Imparter.Store
+﻿namespace Imparter.Channels
 {
     public interface IChannelFactory
     {

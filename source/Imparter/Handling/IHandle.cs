@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Imparter
+namespace Imparter.Handling
 {
     public interface IHandle<in T> where T : class
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Imparter.Channels;
 using Imparter.Handling;
-using Imparter.Store;
 using Imparter.Transport;
 using NLog;
 
@@ -59,10 +59,17 @@ namespace Imparter
                         if (messageAndMetadata == null)
                             break;
 
-
-                        foreach (var handler in _handlers.Resolve(messageAndMetadata.Message))
+                        try
                         {
-                            await handler(messageAndMetadata.Message);
+                            foreach (var handler in _handlers.Resolve(messageAndMetadata.Message))
+                            {
+                                await handler(messageAndMetadata.Message);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Warn(e,  "Exception during handling of message");
+
                         }
 
                     } while (!tokenSourceToken.IsCancellationRequested);
@@ -74,7 +81,7 @@ namespace Imparter
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"Exception in processing loop {e.Message}");
+                _logger.Error(e, $"Exception in processing loop");
             }
         }
     }

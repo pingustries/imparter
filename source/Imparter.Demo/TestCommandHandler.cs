@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Imparter.Channels;
 using Imparter.Store;
 using NLog;
 

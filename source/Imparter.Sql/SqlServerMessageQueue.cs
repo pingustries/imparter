@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Imparter.Channels;
 using Imparter.Store;
 using Imparter.Transport;
 using NLog;
@@ -27,17 +28,18 @@ namespace Imparter.Sql
             _enqueueSql = GetEnqueueSql(queueName);
         }
 
-        public async Task Enqueue(object message)
+        public async Task Enqueue(object message, Metadata metadata = null)
         {
-            var messageSerialized = _transportTranslator.PrepareForTransport(message);
-            var metadata = _transportTranslator.PrepareMetaDataForTransport(message);
+            var messageSerialized = _transportTranslator.SerializeForTransport(message);
+            var typeSerialized  = _transportTranslator.SerialzeTypeForTransport(message);
+            metadata = metadata ?? new Metadata();
 
             using (var connection = CreateConnection())
             using (var cmd = connection.CreateCommand())
             {
                 cmd.CommandText = _enqueueSql;
                 cmd.Parameters.Add("@data", SqlDbType.NVarChar).Value = messageSerialized;
-                cmd.Parameters.Add("@messageType", SqlDbType.NVarChar).Value = metadata.MessageType;
+                cmd.Parameters.Add("@messageType", SqlDbType.NVarChar).Value = typeSerialized;
                 cmd.Parameters.Add("@timeoutUtc", SqlDbType.DateTime).Value = metadata.TimeoutUtc.HasValue ? (object)metadata.TimeoutUtc : DBNull.Value;
                 cmd.Parameters.Add("@tries", SqlDbType.Int).Value = metadata.Tries;
                 cmd.Parameters.Add("@isStopped", SqlDbType.Bit).Value = metadata.IsStopped;
@@ -50,6 +52,7 @@ namespace Imparter.Sql
         {
             Metadata metadata = null;
             string messageSerialized = null;
+            string messageTypeSerialized = null;
             using (var connection = CreateConnection())
             using (var cmd = connection.CreateCommand())
             {
@@ -59,18 +62,19 @@ namespace Imparter.Sql
                     if (reader.Read())
                     {
                         metadata = GetMetadata(reader);
+                        messageTypeSerialized = reader.GetString(0);
                         messageSerialized = reader.GetString(4);
                         _logger.Trace($"Read message from queue: '{messageSerialized}'");
                     }
                 }
             }
 
-            if (messageSerialized == null)
+            if (messageSerialized == null || messageTypeSerialized == null)
                 return null;
             return new MessageAndMetadata
             {
                 Metadata = metadata,
-                Message = _transportTranslator.FromTransport(messageSerialized, metadata)
+                Message = _transportTranslator.FromTransport(messageSerialized, messageTypeSerialized)
             };
         }
 
@@ -85,11 +89,10 @@ namespace Imparter.Sql
 
         private Metadata GetMetadata(SqlDataReader reader)
         {
-            var type = reader.GetString(0);
             var timeOutUtc = reader.IsDBNull(1) ? (DateTime?)null : reader.GetDateTime(1);
             var tries = reader.GetInt32(2);
             var isStopped = reader.GetBoolean(3);
-            return new Metadata {IsStopped = isStopped, TimeoutUtc = timeOutUtc, Tries = tries, MessageType = type};
+            return new Metadata {IsStopped = isStopped, TimeoutUtc = timeOutUtc, Tries = tries};
 
         }
 

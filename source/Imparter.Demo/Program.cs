@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Imparter.Channels;
 using Imparter.Sql;
 using Imparter.Store;
 using NLog;

@@ -13,21 +13,20 @@ namespace Imparter.Transport
             _messageSerializer = messageSerializer;
         }
 
-        public object FromTransport(string serialized, Metadata metadata)
+        public object FromTransport(string serializedMessage, string serializedType)
         {
-            var type = _messageTypeResolver.GetMessageType(metadata.MessageType);
-            var message = _messageSerializer.Deserialize(type, serialized);
+            var type = _messageTypeResolver.GetMessageType(serializedType);
+            var message = _messageSerializer.Deserialize(type, serializedMessage);
             return message;
         }
 
-        public Metadata PrepareMetaDataForTransport(object message)
+        public string SerialzeTypeForTransport(object message)
         {
             var messagetype = _messageTypeResolver.GetMessageName(message.GetType());
-            var metadata = new Metadata { MessageType = messagetype };
-            return metadata;
+            return messagetype;
         }
 
-        public string PrepareForTransport(object message)
+        public string SerializeForTransport(object message)
         {
             var serialized = _messageSerializer.Serialize(message);
             return serialized;

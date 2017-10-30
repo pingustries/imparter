@@ -1,11 +1,9 @@
-﻿using Imparter.Store;
-
-namespace Imparter.Transport
+﻿namespace Imparter.Transport
 {
     public interface ITransportTranslator
     {
-        object FromTransport(string serialized, Metadata metadata);
-        string PrepareForTransport(object message);
-        Metadata PrepareMetaDataForTransport(object message);
+        object FromTransport(string serializedMessage, string serializedType);
+        string SerializeForTransport(object message);
+        string SerialzeTypeForTransport(object message);
     }
 }

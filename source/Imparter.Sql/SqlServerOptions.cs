@@ -1,5 +1,4 @@
-﻿using Imparter.Store;
-using Imparter.Transport;
+﻿using Imparter.Transport;
 
 namespace Imparter.Sql
 {

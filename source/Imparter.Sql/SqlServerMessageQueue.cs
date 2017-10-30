@@ -3,7 +3,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Imparter.Channels;
-using Imparter.Store;
 using Imparter.Transport;
 using NLog;
 

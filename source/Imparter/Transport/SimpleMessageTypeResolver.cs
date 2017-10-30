@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Imparter.Store
+namespace Imparter.Transport
 {
     public class SimpleMessageTypeResolver : IMessageTypeResolver
     {

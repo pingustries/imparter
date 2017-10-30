@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Imparter.Channels;
 using Imparter.Sql;
-using Imparter.Store;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;

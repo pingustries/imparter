@@ -1,6 +1,4 @@
-﻿using Imparter.Store;
-
-namespace Imparter.Transport
+﻿namespace Imparter.Transport
 {
     public class SerializingTransportTranslator : ITransportTranslator
     {

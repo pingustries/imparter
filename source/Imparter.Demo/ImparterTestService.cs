@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Imparter.Store;
 
 namespace Imparter.Demo
@@ -6,9 +7,9 @@ namespace Imparter.Demo
     {
         private readonly ISubscriberChannel _incommingCommandsChannel;
 
-        public ImparterTestService(IChannelFactory imparterChannels)
+        public ImparterTestService(IChannelFactory imparterChannels, string serviceName)
         {
-            var commandHandler = new TestCommandHandler(imparterChannels);
+            var commandHandler = new TestCommandHandler(imparterChannels, serviceName);
             _incommingCommandsChannel = imparterChannels.GetSubscriberChannel("commands");
             _incommingCommandsChannel.Register<TestCommand>(commandHandler.Handle);
         }
@@ -18,9 +19,9 @@ namespace Imparter.Demo
             _incommingCommandsChannel.Subscribe();
         }
         
-        public void Stop()
+        public Task Stop()
         {
-            _incommingCommandsChannel.Unsubscribe();
+            return _incommingCommandsChannel.Unsubscribe();
         }
     }
 }

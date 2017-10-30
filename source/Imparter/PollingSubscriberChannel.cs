@@ -71,7 +71,7 @@ namespace Imparter
                         }
 
                     } while (!tokenSourceToken.IsCancellationRequested);
-                    await Task.Delay(500, tokenSourceToken);
+                    await Task.Delay(1000, tokenSourceToken);
                 }
             }
             catch (Exception e)

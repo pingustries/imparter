@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Imparter.Handling;
 using Imparter.Store;
+using Imparter.Transport;
 using NLog;
 
 namespace Imparter
@@ -11,17 +12,13 @@ namespace Imparter
     {
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IMessageQueue _queue;
-        private readonly IMessageTypeResolver _messageTypeResolver;
-        private readonly IMessageSerializer _serializer;
         private readonly HandlerResolver _handlers;
         private CancellationTokenSource _tokenSource;
         private Task<Task> _task;
 
-        public PollingSubscriberChannel(IMessageQueue queue, IMessageTypeResolver messageTypeResolver, IMessageSerializer serializer)
+        public PollingSubscriberChannel(IMessageQueue queue)
         {
             _queue = queue;
-            _messageTypeResolver = messageTypeResolver;
-            _serializer = serializer;
             _handlers = new HandlerResolver();
         }
 
@@ -62,21 +59,22 @@ namespace Imparter
                         if (messageAndMetadata == null)
                             break;
 
-                        var messageType = _messageTypeResolver.GetMessageType(messageAndMetadata.Metadata.MessageType);
-                        var message = _serializer.Deserialize(messageType, messageAndMetadata.MessageRaw);
 
-                        foreach (var handler in _handlers.Resolve(message))
+                        foreach (var handler in _handlers.Resolve(messageAndMetadata.Message))
                         {
-                            await handler(message);
+                            await handler(messageAndMetadata.Message);
                         }
 
                     } while (!tokenSourceToken.IsCancellationRequested);
-                    await Task.Delay(1000, tokenSourceToken);
+                    try { 
+                        await Task.Delay(1000, tokenSourceToken);
+                    }
+                    catch (OperationCanceledException) { }
                 }
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Exception in processing loop");
+                _logger.Error(e, $"Exception in processing loop {e.Message}");
             }
         }
     }

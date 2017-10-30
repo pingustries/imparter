@@ -1,11 +1,10 @@
-﻿using Imparter.Store;
+﻿using Imparter.Transport;
 
 namespace Imparter.Sql
 {
     public interface ISqlServerOptions
     {
         string ConnectionString { get; }
-        IMessageTypeResolver MessageTypeResolver { get; set; }
-        IMessageSerializer MessageSerializer { get; set; }
+        ITransportTranslator TransportTranslator { get; set; }
     }
 }

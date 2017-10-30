@@ -1,18 +1,17 @@
 ﻿using Imparter.Store;
+using Imparter.Transport;
 
 namespace Imparter.Sql
 {
     public class SqlServerOptions : ISqlServerOptions
     {
         public string ConnectionString { get; }
-        public IMessageTypeResolver MessageTypeResolver { get; set; }
-        public IMessageSerializer MessageSerializer { get; set; }
+        public ITransportTranslator TransportTranslator { get; set; }
 
         public SqlServerOptions(string connectionString)
         {
             ConnectionString = connectionString;
-            MessageTypeResolver = new SimpleMessageTypeResolver();
-            MessageSerializer = new JsonMessageSerializer();
+            TransportTranslator = new SerializingTransportTranslator(new SimpleMessageTypeResolver(), new JsonMessageSerializer());
         }
     }
 }

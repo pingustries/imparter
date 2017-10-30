@@ -1,8 +1,10 @@
-﻿namespace Imparter.Store
+﻿using Imparter.Store;
+
+namespace Imparter.Transport
 {
     public class MessageAndMetadata
     {
-        public string MessageRaw { get; set; }
+        public object Message { get; set; }
         public Metadata Metadata { get; set; }
     }
 }

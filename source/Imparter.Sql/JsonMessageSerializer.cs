@@ -1,4 +1,5 @@
 ﻿using System;
+using Imparter.Transport;
 using Newtonsoft.Json;
 
 namespace Imparter.Sql

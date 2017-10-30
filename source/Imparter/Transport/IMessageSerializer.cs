@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Imparter
+namespace Imparter.Transport
 {
     public interface IMessageSerializer
     {

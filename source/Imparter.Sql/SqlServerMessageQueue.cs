@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Imparter.Store;
-using Newtonsoft.Json;
+using Imparter.Transport;
 using NLog;
 
 namespace Imparter.Sql
@@ -12,38 +12,45 @@ namespace Imparter.Sql
     {
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly string _connectionString;
+        private readonly ITransportTranslator _transportTranslator;
         private readonly string _dequeueSql;
         private readonly string _enqueueSql;
 
         public string Name { get; }
 
-        public SqlServerMessageQueue(string connectionString, string queueName)
+        public SqlServerMessageQueue(string connectionString, string queueName, ITransportTranslator transportTranslator)
         {
             Name = queueName;
-            _connectionString = connectionString; 
+            _connectionString = connectionString;
+            _transportTranslator = transportTranslator;
             _dequeueSql = GetDequeueSql(queueName);
             _enqueueSql = GetEnqueueSql(queueName);
         }
 
-        public async Task Enqueue(MessageAndMetadata messageAndMetadata)
+        public async Task Enqueue(object message)
         {
-            using (var connection = CreateConnection())
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = _enqueueSql;
-                    cmd.Parameters.Add("@data", SqlDbType.NVarChar).Value = messageAndMetadata.MessageRaw;
-                    cmd.Parameters.Add("@messageType", SqlDbType.NVarChar).Value = messageAndMetadata.Metadata.MessageType;
-                    cmd.Parameters.Add("@timeoutUtc", SqlDbType.DateTime).Value = messageAndMetadata.Metadata.TimeoutUtc.HasValue ? (object)messageAndMetadata.Metadata.TimeoutUtc : DBNull.Value;
-                    cmd.Parameters.Add("@tries", SqlDbType.Int).Value = messageAndMetadata.Metadata.Tries;
-                    cmd.Parameters.Add("@isStopped", SqlDbType.Bit).Value = messageAndMetadata.Metadata.IsStopped;
+            var messageSerialized = _transportTranslator.PrepareForTransport(message);
+            var metadata = _transportTranslator.PrepareMetaDataForTransport(message);
 
-                    await cmd.ExecuteNonQueryAsync();
-                }
+            using (var connection = CreateConnection())
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = _enqueueSql;
+                cmd.Parameters.Add("@data", SqlDbType.NVarChar).Value = messageSerialized;
+                cmd.Parameters.Add("@messageType", SqlDbType.NVarChar).Value = metadata.MessageType;
+                cmd.Parameters.Add("@timeoutUtc", SqlDbType.DateTime).Value = metadata.TimeoutUtc.HasValue ? (object)metadata.TimeoutUtc : DBNull.Value;
+                cmd.Parameters.Add("@tries", SqlDbType.Int).Value = metadata.Tries;
+                cmd.Parameters.Add("@isStopped", SqlDbType.Bit).Value = metadata.IsStopped;
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
 
         public async Task<MessageAndMetadata> Dequeue()
         {
-            using(var connection = CreateConnection())
+            Metadata metadata = null;
+            string messageSerialized = null;
+            using (var connection = CreateConnection())
             using (var cmd = connection.CreateCommand())
             {
                 cmd.CommandText = _dequeueSql;
@@ -51,13 +58,20 @@ namespace Imparter.Sql
                 {
                     if (reader.Read())
                     {
-                        var result = Map(reader);
-                        _logger.Trace($"Read message from queue: '{result}'");
-                        return result;
+                        metadata = GetMetadata(reader);
+                        messageSerialized = reader.GetString(4);
+                        _logger.Trace($"Read message from queue: '{messageSerialized}'");
                     }
                 }
             }
-            return null;
+
+            if (messageSerialized == null)
+                return null;
+            return new MessageAndMetadata
+            {
+                Metadata = metadata,
+                Message = _transportTranslator.FromTransport(messageSerialized, metadata)
+            };
         }
 
 
@@ -69,18 +83,14 @@ namespace Imparter.Sql
         }
 
 
-        private MessageAndMetadata Map(SqlDataReader reader)
+        private Metadata GetMetadata(SqlDataReader reader)
         {
             var type = reader.GetString(0);
-            var timeOutUtc = reader.IsDBNull(1) ? (DateTime?) null : reader.GetDateTime(1);
+            var timeOutUtc = reader.IsDBNull(1) ? (DateTime?)null : reader.GetDateTime(1);
             var tries = reader.GetInt32(2);
             var isStopped = reader.GetBoolean(3);
-            var data = reader.GetString(4);
-            return new MessageAndMetadata
-            {
-                MessageRaw = data,
-                Metadata = new Metadata {IsStopped = isStopped, TimeoutUtc = timeOutUtc, Tries = tries, MessageType = type}
-            };
+            return new Metadata {IsStopped = isStopped, TimeoutUtc = timeOutUtc, Tries = tries, MessageType = type};
+
         }
 
         private static string GetEnqueueSql(string queueName)

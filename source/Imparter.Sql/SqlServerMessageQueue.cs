@@ -7,6 +7,7 @@ using NLog;
 
 namespace Imparter.Sql
 {
+    //based on this: http://rusanu.com/2010/03/26/using-tables-as-queues/
     internal class SqlServerMessageQueue : IMessageQueue
     {
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();

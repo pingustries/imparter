@@ -68,21 +68,34 @@ namespace Imparter
                         }
                         catch (Exception e)
                         {
-                            _logger.Warn(e,  "Exception during handling of message");
-
+                            var metadata = GetMetadataForFailedHandling(messageAndMetadata.Metadata);
+                            _logger.Warn(e, $"Failed handling message try {metadata.Tries}.");
+                            await _queue.Enqueue(messageAndMetadata.Message, metadata);
                         }
 
                     } while (!tokenSourceToken.IsCancellationRequested);
-                    try { 
-                        await Task.Delay(1000, tokenSourceToken);
-                    }
-                    catch (OperationCanceledException) { }
+
+                    try { await Task.Delay(1000, tokenSourceToken);}catch (OperationCanceledException) { }
                 }
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"Exception in processing loop");
+                _logger.Error(e, "Exception in processing loop");
             }
+        }
+
+        private Metadata GetMetadataForFailedHandling(Metadata metadata)
+        {
+            var tries = ++metadata.Tries;
+            var shouldStop = tries > 5;
+            var timeout = shouldStop ? (DateTime?)null : (DateTime.UtcNow.AddSeconds(tries * tries * 2));
+
+            return new Metadata
+            {
+                Tries = tries,
+                TimeoutUtc = timeout,
+                IsStopped = shouldStop
+            };
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Imparter.Demo
 
             Console.WriteLine("All Set Up");
 
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < 2000; i++)
             {
                 commandChannel.Impart(new TestCommand($"{i}")).GetAwaiter().GetResult();
             }

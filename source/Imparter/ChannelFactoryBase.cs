@@ -1,4 +1,6 @@
-﻿namespace Imparter.Channels
+﻿using Imparter.Transport;
+
+namespace Imparter
 {
     public abstract class ChannelFactoryBase : IChannelFactory
     {

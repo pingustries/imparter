@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Imparter.Channels;
 
 namespace Imparter.Demo
 {

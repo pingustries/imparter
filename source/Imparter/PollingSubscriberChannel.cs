@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Imparter.Channels;
 using Imparter.Handling;
 using Imparter.Transport;
 using NLog;

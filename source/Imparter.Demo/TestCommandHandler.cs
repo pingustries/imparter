@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Imparter.Channels;
 using NLog;
 
 namespace Imparter.Demo

@@ -1,6 +1,4 @@
-﻿using Imparter.Channels;
-
-namespace Imparter.Transport
+﻿namespace Imparter.Transport
 {
     public class MessageAndMetadata
     {

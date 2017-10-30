@@ -1,4 +1,4 @@
-﻿using Imparter.Channels;
+﻿using Imparter.Transport;
 
 namespace Imparter.Sql
 {

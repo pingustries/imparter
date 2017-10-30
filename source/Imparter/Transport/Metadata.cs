@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Imparter.Channels
+namespace Imparter.Transport
 {
     public class Metadata
     {

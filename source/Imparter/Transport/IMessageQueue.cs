@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Imparter.Transport;
 
-namespace Imparter.Channels
+namespace Imparter.Transport
 {
     public interface IMessageQueue
     {

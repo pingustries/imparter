@@ -56,7 +56,6 @@ namespace Imparter.Sql
             using (var cmd = connection.CreateCommand())
             {
                 cmd.CommandText = _dequeueSql;
-                cmd.Parameters.Add("@Now", SqlDbType.DateTime).Value = DateTime.UtcNow;
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     if (reader.Read())
@@ -107,12 +106,15 @@ namespace Imparter.Sql
 WITH cte AS(
     SELECT TOP(1) MessageType, Data, TimeoutUtc, Tries, IsStopped 
     FROM {0} WITH (ROWLOCK, READPAST)
-    WHERE (TimeoutUTC IS NULL OR TimeoutUTC < @Now) AND IsStopped = 0
-    ORDER BY TimeoutUTC DESC
+    WHERE (TimeoutUTC IS NULL OR TimeoutUTC < GETUTCDATE()) AND IsStopped = 0
+    ORDER BY TimeoutUTC DESC, Id ASC
 )
-DELETE FROM cte
+UPDATE cte SET
+    Tries = Tries + 1,
+    TimeoutUtc =  DATEADD(ss, Tries + 1, GETUTCDATE()),
+    IsStopped = CASE WHEN Tries > 4 THEN 1 ELSE 0 END
 OUTPUT 
-    DELETED.MessageType, DELETED.TimeoutUtc, DELETED.Tries, DELETED.IsStopped, DELETED.Data", queueName);
+    INSERTED.MessageType, INSERTED.TimeoutUtc, INSERTED.Tries, INSERTED.IsStopped, INSERTED.Data", queueName);
         }
     }
 }

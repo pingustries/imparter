@@ -6,9 +6,9 @@ namespace Imparter.Demo
     {
         private readonly ISubscriberChannel _incommingCommandsChannel;
 
-        public ImparterTestService(IChannelFactory imparterChannels, string serviceName)
+        public ImparterTestService(IChannelFactory imparterChannels)
         {
-            var commandHandler = new TestCommandHandler(imparterChannels, serviceName);
+            var commandHandler = new TestCommandHandler(imparterChannels);
             _incommingCommandsChannel = imparterChannels.GetSubscriberChannel("commands");
             _incommingCommandsChannel.Register<TestCommand>(commandHandler.Handle);
         }

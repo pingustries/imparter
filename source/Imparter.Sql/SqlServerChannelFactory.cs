@@ -1,4 +1,5 @@
-﻿using Imparter.Transport;
+﻿using System.Threading.Tasks;
+using Imparter.Transport;
 
 namespace Imparter.Sql
 {
@@ -16,10 +17,16 @@ namespace Imparter.Sql
             return new SqlServerMessageQueue(_settings.ConnectionString, name, _settings.TransportTranslator);
         }
 
-        public void EnsureChannelExists(string channelName)
+        public async Task EnsureChannelExists(string channelName)
         {
-            var tableBuilder = new SqlChannelCreator(_settings.ConnectionString);
-            tableBuilder.CreateIfNotExists(channelName).GetAwaiter().GetResult();
+            var tableOperations = new SqlChannelOperations(_settings.ConnectionString);
+            await tableOperations.CreateIfNotExists(channelName);
+        }
+
+        public async Task PurgeChannel(string channelName)
+        {
+            var tableOperations = new SqlChannelOperations(_settings.ConnectionString);
+            await tableOperations.Purge(channelName);
         }
     }
 }

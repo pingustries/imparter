@@ -20,7 +20,7 @@ namespace Imparter.Sql
                 cmd.Parameters.AddRange(parameters);
                 cmd.CommandText = sql;
                 var result  = await cmd.ExecuteScalarAsync();
-                return ((int) result) == 1;
+                return ((int?) result) == 1;
             }
         }
 

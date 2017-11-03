@@ -16,56 +16,13 @@ namespace Imparter.Demo
         {
             InitLogging();
             var channelFactory = InitFactory();
-            //RunInputMode(channelFactory);
-            RunTestMode(channelFactory);
+            RunInputMode(channelFactory);
             Console.WriteLine("DONE");
-            Console.ReadKey();
-        }
-
-        private static void RunTestMode(IChannelFactory channelFactory)
-        {
-            var services = new List<ImparterTestService>();
-            for (int i = 0; i < 20; i++)
-            {
-                var service = new ImparterTestService(channelFactory, i.ToString());
-                service.Start();
-                services.Add(service);
-            }
-
-            var eventChannel = channelFactory.GetSubscriberChannel("events");
-            var eventHandler = new TestEventHandler();
-            eventChannel.Register<TestEvent>(eventHandler.Handle);
-            eventChannel.Subscribe();
-
-            var commandChannel = channelFactory.GetImparterChannel("commands");
-
-            Console.WriteLine("All Set Up");
-
-            for(int i = 0; i < 2000; i++)
-            {
-                commandChannel.Impart(new TestCommand($"{i}")).GetAwaiter().GetResult();
-            }
-
-            Console.WriteLine("all sent");
-            Console.ReadKey();
-            eventChannel.Unsubscribe().GetAwaiter().GetResult();
-
-
-            var stops = services.Select(s => s.Stop());
-            Task.WaitAll(stops.ToArray());
-
-            Console.WriteLine($"received : {eventHandler.AllResults.Keys.Count}");
-            Console.WriteLine($"\tHandler\t\tHandled");
-            foreach (var handlerAndPayloads in eventHandler.ResultPerHandler)
-            {
-                Console.WriteLine($"\t{handlerAndPayloads.Key}\t\t{handlerAndPayloads.Value.Count}");
-            }
-            
         }
 
         private static void RunInputMode(IChannelFactory channelFactory)
         {
-            var service = new ImparterTestService(channelFactory, "testService");
+            var service = new ImparterTestService(channelFactory);
             service.Start();
 
             var commandChannel = channelFactory.GetImparterChannel("commands");
@@ -89,10 +46,12 @@ namespace Imparter.Demo
         private static IChannelFactory InitFactory()
         {
             var messageQueueFactory = new SqlServerChannelFactory(new SqlServerOptions(
-                @"Data Source=(localdb)\v11.0;Initial Catalog=ImparterTest;Integrated Security=True;Connect Timeout=30"));
-            messageQueueFactory.EnsureChannelExists("commands");
-            messageQueueFactory.EnsureChannelExists("events");
-
+                //@"Data Source=(localdb)\v11.0;Initial Catalog=ImparterTest;Integrated Security=True;Connect Timeout=30"
+            @"Data Source=(local)\SqlExpress;Initial Catalog=ImparterTest;Integrated Security=True;Connect Timeout=30"
+));
+            Task.WaitAll(messageQueueFactory.EnsureChannelExists("commands"), messageQueueFactory.EnsureChannelExists("events"));
+            Task.WaitAll(messageQueueFactory.PurgeChannel("commands"), messageQueueFactory.PurgeChannel("events"));
+            
             return messageQueueFactory;
         }
 
@@ -100,9 +59,15 @@ namespace Imparter.Demo
         {
             var config = new LoggingConfiguration();
             var consoleTarget = new ColoredConsoleTarget();
-            consoleTarget.Layout = new SimpleLayout("${message}");
+            consoleTarget.Layout = new SimpleLayout("${message} ${exception:format=message}");
             config.AddTarget("console", consoleTarget);
+
+            var fileTarget = new FileTarget();
+            fileTarget.Layout = new SimpleLayout("${message} ${exception:format=message}"); 
+            fileTarget.FileName = new SimpleLayout("C:\\temp\\impartertest.txt");
+
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, consoleTarget));
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, fileTarget));
             LogManager.Configuration = config;
         }
     }

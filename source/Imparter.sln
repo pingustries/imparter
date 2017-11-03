@@ -5,13 +5,15 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imparter", "Imparter\Imparter.csproj", "{B167C10A-F568-417F-BD96-092F2FBE415F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.Demo", "Imparter.Demo\Imparter.Demo.csproj", "{78BDBA95-EB60-4AF7-AF25-59D18696472C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imparter.Demo", "Imparter.Demo\Imparter.Demo.csproj", "{78BDBA95-EB60-4AF7-AF25-59D18696472C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imparter.Sql", "Imparter.Sql\Imparter.Sql.csproj", "{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{1087A055-3090-40E3-A6A8-25947B890136}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlServerQueueDemo", "SqlServerQueueDemo", "{309E25F3-79D7-44F2-9E85-7FABE39A5B53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imparter.ConcurrencyDemo", "Imparter.ConcurrencyDemo\Imparter.ConcurrencyDemo.csproj", "{B5722E7D-6086-4C1D-8469-282D76303468}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EEC6B0C-EA0B-4D04-A5E5-CE2259BE292A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5722E7D-6086-4C1D-8469-282D76303468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5722E7D-6086-4C1D-8469-282D76303468}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5722E7D-6086-4C1D-8469-282D76303468}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5722E7D-6086-4C1D-8469-282D76303468}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,6 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{78BDBA95-EB60-4AF7-AF25-59D18696472C} = {309E25F3-79D7-44F2-9E85-7FABE39A5B53}
 		{309E25F3-79D7-44F2-9E85-7FABE39A5B53} = {1087A055-3090-40E3-A6A8-25947B890136}
+		{B5722E7D-6086-4C1D-8469-282D76303468} = {309E25F3-79D7-44F2-9E85-7FABE39A5B53}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FB07FEF7-F1D6-4FC4-AE52-D321657CFD0E}

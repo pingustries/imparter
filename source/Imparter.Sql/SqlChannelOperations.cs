@@ -3,12 +3,12 @@ using NLog;
 
 namespace Imparter.Sql
 {
-    public class SqlChannelCreator
+    public class SqlChannelOperations
     {
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly SqlExecutor _sqlExecutor;
 
-        public SqlChannelCreator(string connectionString)
+        public SqlChannelOperations(string connectionString)
         {
             _sqlExecutor = new SqlExecutor(connectionString);
         }
@@ -37,6 +37,12 @@ END
                 _logger.Info($"Queue table '{channelName}' was created");
             else
                 _logger.Debug($"Queue table '{channelName}' already exists");
+        }
+
+        public async Task Purge(string channelName)
+        {
+            string sql = string.Format("TRUNCATE TABLE {0}", channelName);
+            await _sqlExecutor.ExecuteNonQuery(sql);
         }
     }
 }

@@ -13,11 +13,15 @@ namespace Imparter.ConcurrencyDemo
     {
         public const int NumberOfMessages = 1000;
         public const int NumberOfSubscribers = 20;
+        public const int PercentageOfFailedHandlings = 0;
+
         static void Main(string[] args)
         {
             InitLogging();
             var logger = LogManager.GetCurrentClassLogger();
             var factory = InitFactory();
+
+            Random random = new Random();
 
             var imparter = factory.GetImparterChannel("concurrencyMessages");
 
@@ -28,6 +32,8 @@ namespace Imparter.ConcurrencyDemo
                 var i1 = i;
                 subChannel.Register<Message>(m =>
                 {
+                    if(random.Next(1, 100) <= PercentageOfFailedHandlings)
+                        throw new Exception("Failed because of random");
                     ResultContext.Handled(m.Value, i1);
                     return Task.CompletedTask;
                 });

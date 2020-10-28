@@ -12,8 +12,8 @@ namespace Imparter.ConcurrencyDemo
     class Program
     {
         public const int NumberOfMessages = 1000;
-        public const int NumberOfSubscribers = 20;
-        public const int PercentageOfFailedHandlings = 0;
+        public const int NumberOfSubscribers = 40;
+        public const int PercentageOfFailedHandlings = 10;
 
         static void Main(string[] args)
         {
